@@ -4,6 +4,13 @@ import { Profile } from '../../components/Profile'
 import { CardsLayout, FormContainer, HomeContainer } from './styles'
 
 export function Home() {
+  const text = `Programming languages all have built-in data structures, but these often
+        differ from one language to another. This article attempts to list the
+        built-in data structures available in JavaScript and what properties
+        they have. These can be used to build other data structures. Wherever
+        possible, comparisons with other languages are drawn.`
+  const title = 'JavaScript data types and data structures'
+  const amountTime = 'ha 1 dia'
   return (
     <HomeContainer>
       <Header />
@@ -16,12 +23,12 @@ export function Home() {
         <input type="text" placeholder="Buscar conteúdo" />
       </FormContainer>
       <CardsLayout>
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
+        <Card text={text} title={title} amountTime={amountTime} />
+        <Card text={text} title={title} amountTime={amountTime} />
+        <Card text={text} title={title} amountTime={amountTime} />
+        <Card text={text} title={title} amountTime={amountTime} />
+        <Card text={text} title={title} amountTime={amountTime} />
+        <Card text={text} title={title} amountTime={amountTime} />
       </CardsLayout>
     </HomeContainer>
   )
