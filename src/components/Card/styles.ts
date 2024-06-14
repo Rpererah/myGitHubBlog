@@ -17,7 +17,7 @@ export const CardContainer = styled.section`
     h1 {
       font-size: 1.25rem;
       color: ${(props) => props.theme['base-title']};
-      max-width: 17.688rem;
+      max-width: 10rem;
     }
     p {
       font-size: 0.875rem;

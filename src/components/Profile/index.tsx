@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { faBuilding } from '@fortawesome/free-regular-svg-icons'
 import {
@@ -11,33 +12,56 @@ import {
   ProfileContainer,
   TitleProfileContainer,
 } from './styles'
+import { api } from '../../lib/axios'
+import { useEffect, useState } from 'react'
+
+interface profileProps {
+  login: string
+  followers: string
+  avatar_url: string
+  bio: string
+}
 
 export function Profile() {
+  const [profile, setProfile] = useState<profileProps>({
+    login: '',
+    followers: '',
+    avatar_url: '',
+    bio: '',
+  })
+  async function getGitHubProfile() {
+    try {
+      const response = await api.get('')
+      const { login, followers, avatar_url, bio } = response.data
+      setProfile({ login, followers, avatar_url, bio })
+      console.log(profile)
+    } catch {
+      console.error('Erro ao obter perfil do GitHub')
+    }
+  }
+
+  useEffect(() => {
+    getGitHubProfile()
+  }, [])
+
   return (
     <ProfileContainer>
       <div>
-        <img
-          src="https://avatars.githubusercontent.com/u/54297084?v=4"
-          alt=""
-        />
+        <img src={profile.avatar_url} alt="" />
       </div>
       <div>
         <TitleProfileContainer>
-          <h2>Rpererah</h2>
+          <h2>{profile.login}</h2>
           <a href="">
             GITHUB <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </a>
         </TitleProfileContainer>
 
-        <p>
-          Tristique volutpat pulvinar vel massa, pellentesque egestas. Eu
-          viverra massa quam dignissim aenean malesuada suscipit. Nunc, volutpat
-          pulvinar vel mass.
-        </p>
+        <p>{profile.bio}</p>
         <IconsContainer>
           <IconsLayout>
             <FontAwesomeIcon icon={faGithub} />
-            <p>Rpererah</p>
+            <p>{profile.login}</p>
           </IconsLayout>
           <IconsLayout>
             <FontAwesomeIcon icon={faBuilding} />
@@ -45,7 +69,7 @@ export function Profile() {
           </IconsLayout>
           <IconsLayout>
             <FontAwesomeIcon icon={faUserGroup} />
-            <p>32 seguidores</p>
+            <p>{profile.followers}</p>
           </IconsLayout>
         </IconsContainer>
       </div>

@@ -7,9 +7,12 @@ interface CardProps {
 }
 
 export function Card({ title, text, amountTime }: CardProps) {
-  const maxWords = 41
+  const maxWords = 20
 
-  const truncatedText = text.split(' ').slice(0, maxWords).join(' ')
+  let truncatedText = ''
+  if (text) {
+    truncatedText = text.split(' ').slice(0, maxWords).join(' ')
+  }
   return (
     <CardContainer>
       <div>
@@ -17,7 +20,7 @@ export function Card({ title, text, amountTime }: CardProps) {
       </div>
       <p>
         {truncatedText}
-        {text.length > 25 && '...'}
+        {text != null && text.length > 25 && '...'}
       </p>
     </CardContainer>
   )
