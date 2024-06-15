@@ -7,7 +7,7 @@ export function Router() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/card-details" element={<CardDetails />} />
+        <Route path="/card-details/:id" element={<CardDetails />} />
       </Routes>
     </BrowserRouter>
   )

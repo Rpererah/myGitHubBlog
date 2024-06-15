@@ -8,8 +8,9 @@ import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { api } from '../../lib/axios'
-import { formatDistance } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { calculateDistance } from '../../utils/formmatter'
 
 const searchFormSchema = z.object({
   query: z.string(),
@@ -26,6 +27,8 @@ export function Home() {
   const [repository, setRepository] = useState<repositoryProps[]>([])
   const [date] = useState(new Date())
   const [distance, setDistance] = useState<string[]>([])
+  const [publicRepos, setPublicRepos] = useState<number>(0)
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function getRespositorys() {
@@ -37,7 +40,6 @@ export function Home() {
         },
       })
 
-      console.log(response.data)
       const repositoriesData: repositoryProps[] = response.data.map(
         (repo: repositoryProps) => ({
           id: repo.id,
@@ -47,38 +49,61 @@ export function Home() {
         }),
       )
       setRepository(repositoriesData)
-      console.log(repository)
     }
 
     getRespositorys()
   }, [])
 
   useEffect(() => {
-    const calculateDistance = () => {
-      const updatedDates = repository.map((repo) => new Date(repo.updated_at))
-      const distances = updatedDates.map((updatedDate) =>
-        formatDistance(updatedDate, date, { locale: ptBR, addSuffix: true }),
-      )
-      setDistance(distances)
-    }
-    calculateDistance()
+    const currentDate = new Date()
+    const calculatedDistances = repository.map((repo) =>
+      calculateDistance(repo, currentDate),
+    )
+    setDistance(calculatedDistances)
   }, [date, repository])
 
   const { register, handleSubmit } = useForm<SearchFormInputs>({
     resolver: zodResolver(searchFormSchema),
   })
 
-  function handleSearchIssues(data: SearchFormInputs) {
-    console.log(data)
+  async function handleSearchIssues(data: SearchFormInputs) {
+    const response = await axios.get(
+      `https://api.github.com/search/repositories`,
+      {
+        params: {
+          q: `user:rpererah ${data.query}`,
+          sort: 'updated',
+          order: 'desc',
+          per_page: 8,
+        },
+      },
+    )
+
+    console.log('API response:', response.data.items)
+
+    const repositoriesData: repositoryProps[] = response.data.items.map(
+      (repo: repositoryProps) => ({
+        id: repo.id,
+        name: repo.name,
+        updated_at: repo.updated_at,
+        description: repo.description,
+      }),
+    )
+    setRepository(repositoriesData)
   }
+
+  function handleNavigate(id: number) {
+    navigate(`card-details/${id}`)
+  }
+
   return (
     <HomeContainer>
       <Header />
-      <Profile />
+      <Profile onPublicReposFetched={setPublicRepos} />
 
       <FormContainer onSubmit={handleSubmit(handleSearchIssues)}>
         <div>
-          <h3>Publicacoes</h3> <h4>6 publicações</h4>
+          <h3>Publicacoes</h3> <h4>{publicRepos} publicações</h4>
         </div>
         <input
           {...register('query')}
@@ -89,10 +114,12 @@ export function Home() {
       <CardsLayout>
         {repository.map((repositoryItem: repositoryProps, index: number) => (
           <Card
+            id={repositoryItem.id}
             key={repositoryItem.id}
             text={repositoryItem.description}
             title={repositoryItem.name}
             amountTime={distance[index]}
+            onClick={handleNavigate}
           />
         ))}
       </CardsLayout>

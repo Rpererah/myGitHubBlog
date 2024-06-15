@@ -15,26 +15,33 @@ import {
 import { api } from '../../lib/axios'
 import { useEffect, useState } from 'react'
 
-interface profileProps {
+interface ProfileProps {
+  onPublicReposFetched: (public_repos: number) => void
+}
+
+interface ProfileDataProps {
   login: string
   followers: string
   avatar_url: string
   bio: string
+  public_repos: number
 }
 
-export function Profile() {
-  const [profile, setProfile] = useState<profileProps>({
+export function Profile({ onPublicReposFetched }: ProfileProps) {
+  const [profile, setProfile] = useState<ProfileDataProps>({
     login: '',
     followers: '',
     avatar_url: '',
     bio: '',
+    public_repos: 0,
   })
   async function getGitHubProfile() {
     try {
       const response = await api.get('')
-      const { login, followers, avatar_url, bio } = response.data
-      setProfile({ login, followers, avatar_url, bio })
-      console.log(profile)
+      console.log(response.data)
+      const { login, followers, avatar_url, bio, public_repos } = response.data
+      setProfile({ login, followers, avatar_url, bio, public_repos })
+      onPublicReposFetched(public_repos)
     } catch {
       console.error('Erro ao obter perfil do GitHub')
     }
@@ -52,7 +59,11 @@ export function Profile() {
       <div>
         <TitleProfileContainer>
           <h2>{profile.login}</h2>
-          <a href="">
+          <a
+            href="https://github.com/Rpererah"
+            target="_blank"
+            rel="noreferrer"
+          >
             GITHUB <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </a>
         </TitleProfileContainer>
